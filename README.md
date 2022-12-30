@@ -1,0 +1,1 @@
+# mercadobitcoin-api-consumption
