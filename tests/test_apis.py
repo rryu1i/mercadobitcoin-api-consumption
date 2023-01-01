@@ -1,8 +1,11 @@
 import datetime
-import pytest
-from mercado_bitcoin.apis import DaySummaryApi, TradesApi, MercadoBitcoinApi
 from unittest.mock import patch
+
+import pytest
 import requests
+from mercado_bitcoin.apis import DaySummaryApi, MercadoBitcoinApi, TradesApi
+
+# flake8: noqa
 
 
 class TestDaySummaryApi:
@@ -48,7 +51,12 @@ class TestTradesApi:
                 datetime.datetime(2021, 6, 15),
                 "https://www.mercadobitcoin.net/api/TEST/trades/1623466800/1623726000",
             ),
-            ("TEST", None, None, "https://www.mercadobitcoin.net/api/TEST/trades"),
+            (
+                "TEST",
+                None,
+                None,
+                "https://www.mercadobitcoin.net/api/TEST/trades",
+            ),
             (
                 "TEST",
                 None,
@@ -64,16 +72,16 @@ class TestTradesApi:
         ],
     )
     def test_get_endpoint(self, coin, date_from, date_to, expected):
-        actual = TradesApi(coin=coin)._get_endpoint(date_from=date_from, date_to=date_to)
+        actual = TradesApi(coin=coin)._get_endpoint(
+            date_from=date_from, date_to=date_to
+        )
         assert actual == expected
 
 
 @pytest.fixture()
 @patch("mercado_bitcoin.apis.MercadoBitcoinApi.__abstractmethods__", set())
 def fixture_mercado_bitcoin_api():
-    return MercadoBitcoinApi(
-        coin="test"
-    )
+    return MercadoBitcoinApi(coin="test")
 
 
 def mocked_requests_get(*args, **kwargs):
@@ -97,24 +105,36 @@ def mocked_requests_get(*args, **kwargs):
 
 
 class TestMercadoBitcoinApi:
-
     @patch("requests.get")
-    @patch("mercado_bitcoin.apis.MercadoBitcoinApi._get_endpoint", return_value="valid_endpoint")
-    def test_get_data_requests_is_called(self, mock_get_endpoint, mock_requests, fixture_mercado_bitcoin_api):
+    @patch(
+        "mercado_bitcoin.apis.MercadoBitcoinApi._get_endpoint",
+        return_value="valid_endpoint",
+    )
+    def test_get_data_requests_is_called(
+        self, mock_get_endpoint, mock_requests, fixture_mercado_bitcoin_api
+    ):
         fixture_mercado_bitcoin_api.get_data()
         mock_requests.assert_called_once_with("valid_endpoint")
 
-
     @patch("requests.get", side_effect=mocked_requests_get)
-    @patch("mercado_bitcoin.apis.MercadoBitcoinApi._get_endpoint", return_value="valid_endpoint")
-    def test_get_data_with_valid_endpoint(self, mock_get_endpoint, mock_requests, fixture_mercado_bitcoin_api):
+    @patch(
+        "mercado_bitcoin.apis.MercadoBitcoinApi._get_endpoint",
+        return_value="valid_endpoint",
+    )
+    def test_get_data_with_valid_endpoint(
+        self, mock_get_endpoint, mock_requests, fixture_mercado_bitcoin_api
+    ):
         actual = fixture_mercado_bitcoin_api.get_data()
         excepted = {"foo": "bar"}
         assert actual == excepted
 
-
     @patch("requests.get", side_effect=mocked_requests_get)
-    @patch("mercado_bitcoin.apis.MercadoBitcoinApi._get_endpoint", return_value="invalid_endpoint")
-    def test_get_data_with_valid_endpoint(self, mock_get_endpoint, mock_requests, fixture_mercado_bitcoin_api):
+    @patch(
+        "mercado_bitcoin.apis.MercadoBitcoinApi._get_endpoint",
+        return_value="invalid_endpoint",
+    )
+    def test_get_data_with_valid_endpoint(
+        self, mock_get_endpoint, mock_requests, fixture_mercado_bitcoin_api
+    ):
         with pytest.raises(Exception):
             fixture_mercado_bitcoin_api.get_data()

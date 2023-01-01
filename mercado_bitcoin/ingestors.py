@@ -1,9 +1,9 @@
-
-from abc import ABC, abstractmethod
 import datetime
+from abc import ABC, abstractmethod
 from typing import List
-from mercado_bitcoin.writers import DataWriter
+
 from mercado_bitcoin.apis import DaySummaryApi
+
 
 class DataIngestor(ABC):
     def __init__(

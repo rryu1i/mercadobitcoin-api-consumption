@@ -1,0 +1,62 @@
+
+
+name: CI
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+
+  workflow_dispatch:
+
+
+jobs:
+  lint:
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ['3.8']
+        os: [ubuntu-latest]
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{matrix.python-version}}
+      - name: Install Project
+        run: pip install '.[test]'
+      # - name: Typing
+      #   run: mypy --ignore-missing-imports dundie
+      - name: Look for style errors
+        run: pflake8
+      - name: Check for importing style
+        run: isort --profile=black -m 3 --check --diff mercado_bitcoin tests
+      - name: Look for auto format errors
+        run: black --check --diff mercado_bitcoin tests
+
+  tests:
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10']
+        os: [ubuntu-latest]
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{matrix.python-version}}
+      - name: Install Project
+        run: pip install '.[test]'
+      - name: Run tests
+        run: pytest -v --forked --junitxml=test-result.xml
+      - name: publish junit results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: test-result.xml
+          check_name: Test Result (Python ${{matrix.python-version}})

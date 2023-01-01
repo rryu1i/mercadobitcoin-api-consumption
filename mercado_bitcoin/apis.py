@@ -1,29 +1,26 @@
-import os
-import requests
+import datetime
 import logging
 from abc import ABC, abstractmethod
-import datetime
-from backoff import on_exception, expo
-from ratelimit import limits, RateLimitException
 
+import requests
+from backoff import expo, on_exception
+from ratelimit import RateLimitException, limits
 
 logger = logging.getLogger(__name__)  # nome do script (ingestao)
 logging.basicConfig(level=logging.INFO)
 
 
 class MercadoBitcoinApi(ABC):
-
-
-    def __init__(self, coin:str) -> None:
+    def __init__(self, coin: str) -> None:
         self.coin = coin
         self.base_endpoint = "https://www.mercadobitcoin.net/api"
 
-
     @abstractmethod  # pois sabemos que o metodo devera ser extendido
-    def _get_endpoint(self, **kwargs) -> str:  # python entende que a assinatura dessa funcao pode receber qualquer tipo de argumento do tipo chave valor
+    def _get_endpoint(
+        self, **kwargs
+    ) -> str:  # python entende que a assinatura dessa funcao pode receber qualquer tipo de argumento do tipo chave valor
         pass
 
-    
     @on_exception(expo, RateLimitException, max_tries=10)
     @limits(calls=29, period=38)
     @on_exception(expo, requests.exceptions.HTTPError, max_tries=10)
@@ -38,9 +35,9 @@ class MercadoBitcoinApi(ABC):
 class DaySummaryApi(MercadoBitcoinApi):
     type = "day-summary"
 
-
     def _get_endpoint(self, date: datetime.date):
         return f"{self.base_endpoint}/{self.coin}/{self.type}/{date.year}/{date.month}/{date.day}"
+
 
 class TradesApi(MercadoBitcoinApi):
     type = "trades"
@@ -49,7 +46,9 @@ class TradesApi(MercadoBitcoinApi):
         return int(date.timestamp())
 
     def _get_endpoint(
-        self, date_from: datetime.datetime = None, date_to: datetime.datetime = None
+        self,
+        date_from: datetime.datetime = None,
+        date_to: datetime.datetime = None,
     ) -> str:
         if date_from and not date_to:
             unix_date_from = self._get_unix_epoch(date_from)
