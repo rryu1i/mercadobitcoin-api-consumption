@@ -42,8 +42,8 @@ class DaySummaryApi(MercadoBitcoinApi):
 class TradesApi(MercadoBitcoinApi):
     type = "trades"
 
-    def _get_unix_epoch(self, date: datetime) -> int:
-        return int(date.timestamp())
+    def _get_unix_epoch(self, date: datetime.datetime) -> int:
+        return int((date - datetime.datetime(1970, 1, 1)).total_seconds())
 
     def _get_endpoint(
         self,

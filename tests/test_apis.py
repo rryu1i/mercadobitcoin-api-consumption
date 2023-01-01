@@ -43,13 +43,13 @@ class TestTradesApi:
                 "TEST",
                 datetime.datetime(2019, 1, 1),
                 datetime.datetime(2019, 1, 2),
-                "https://www.mercadobitcoin.net/api/TEST/trades/1546308000/1546394400",
+                "https://www.mercadobitcoin.net/api/TEST/trades/1546300800/1546387200",
             ),
             (
                 "TEST",
                 datetime.datetime(2021, 6, 12),
                 datetime.datetime(2021, 6, 15),
-                "https://www.mercadobitcoin.net/api/TEST/trades/1623466800/1623726000",
+                "https://www.mercadobitcoin.net/api/TEST/trades/1623456000/1623715200",
             ),
             (
                 "TEST",
@@ -67,7 +67,7 @@ class TestTradesApi:
                 "TEST",
                 datetime.datetime(2021, 6, 12),
                 None,
-                "https://www.mercadobitcoin.net/api/TEST/trades/1623466800",
+                "https://www.mercadobitcoin.net/api/TEST/trades/1623456000",
             ),
         ],
     )
